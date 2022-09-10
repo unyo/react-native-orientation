@@ -156,6 +156,13 @@ RCT_EXPORT_METHOD(lockToPortrait)
   #if DEBUG
     NSLog(@"Locked to Portrait");
   #endif
+  
+  // https://stackoverflow.com/a/73558033/2077884
+  if #available(iOS 16.0, *) {
+    let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+    windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
+  }
+  
   [Orientation setOrientation:UIInterfaceOrientationMaskPortrait];
   [[NSOperationQueue mainQueue] addOperationWithBlock:^ {
     [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
@@ -169,6 +176,13 @@ RCT_EXPORT_METHOD(lockToLandscape)
   #if DEBUG
     NSLog(@"Locked to Landscape");
   #endif
+  
+  // https://stackoverflow.com/a/73558033/2077884
+  if #available(iOS 16.0, *) {
+    let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+    windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
+  }
+  
   UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
   NSString *orientationStr = [self getSpecificOrientationStr:orientation];
   if ([orientationStr isEqualToString:@"LANDSCAPE-LEFT"]) {
