@@ -156,11 +156,27 @@ RCT_EXPORT_METHOD(lockToPortrait)
   #if DEBUG
     NSLog(@"Locked to Portrait");
   #endif
-  
-  // https://stackoverflow.com/a/73558033/2077884
-  if #available(iOS 16.0, *) {
-    let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
-    windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
+
+  // http://events.jianshu.io/p/28359636ef72
+  if (@available(iOS 16.0, *)) {
+    @try {
+        NSArray *array = [[[UIApplication sharedApplication] connectedScenes] allObjects];
+        UIWindowScene *ws = (UIWindowScene *)array[0];
+        Class GeometryPreferences = NSClassFromString(@"UIWindowSceneGeometryPreferencesIOS");
+        id geometryPreferences = [[GeometryPreferences alloc]init];
+        [geometryPreferences setValue:@(UIInterfaceOrientationMaskPortrait) forKey:@"interfaceOrientations"];
+        SEL sel_method = NSSelectorFromString(@"requestGeometryUpdateWithPreferences:errorHandler:");
+        void (^ErrorBlock)(NSError *err) = ^(NSError *err){
+              NSLog(@"调用了Block%@",err);
+        };
+        if ([ws respondsToSelector:sel_method]) {
+            (((void (*)(id, SEL,id,id))[ws methodForSelector:sel_method])(ws, sel_method,geometryPreferences,ErrorBlock));
+        }
+    } @catch (NSException *exception) {
+        NSLog(@"*****************************华丽分割线**************************");
+        NSLog(@"%@",exception);
+    } @finally {
+    }
   }
   
   [Orientation setOrientation:UIInterfaceOrientationMaskPortrait];
@@ -177,12 +193,28 @@ RCT_EXPORT_METHOD(lockToLandscape)
     NSLog(@"Locked to Landscape");
   #endif
   
-  // https://stackoverflow.com/a/73558033/2077884
-  if #available(iOS 16.0, *) {
-    let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
-    windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
+  // http://events.jianshu.io/p/28359636ef72
+  if (@available(iOS 16.0, *)) {
+    @try {
+        NSArray *array = [[[UIApplication sharedApplication] connectedScenes] allObjects];
+        UIWindowScene *ws = (UIWindowScene *)array[0];
+        Class GeometryPreferences = NSClassFromString(@"UIWindowSceneGeometryPreferencesIOS");
+        id geometryPreferences = [[GeometryPreferences alloc]init];
+        [geometryPreferences setValue:@(UIInterfaceOrientationMaskLandscapeRight) forKey:@"interfaceOrientations"];
+        SEL sel_method = NSSelectorFromString(@"requestGeometryUpdateWithPreferences:errorHandler:");
+        void (^ErrorBlock)(NSError *err) = ^(NSError *err){
+              NSLog(@"调用了Block%@",err);
+        };
+        if ([ws respondsToSelector:sel_method]) {
+            (((void (*)(id, SEL,id,id))[ws methodForSelector:sel_method])(ws, sel_method,geometryPreferences,ErrorBlock));
+        }
+    } @catch (NSException *exception) {
+        NSLog(@"*****************************华丽分割线**************************");
+        NSLog(@"%@",exception);
+    } @finally {
+    }
   }
-  
+
   UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
   NSString *orientationStr = [self getSpecificOrientationStr:orientation];
   if ([orientationStr isEqualToString:@"LANDSCAPE-LEFT"]) {
